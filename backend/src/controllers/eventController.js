@@ -1,4 +1,5 @@
 import HistoricalEvent from "../models/HistoricalEvent.js";
+import mongoose from "mongoose";
 
 // Get all events with optional filters
 export const getEvents = async (req, res) => {
@@ -25,8 +26,19 @@ export const getEvents = async (req, res) => {
 
 // Get single event by ID
 export const getEventById = async (req, res) => {
+  const { id } = req.params;
   try {
-    const event = await HistoricalEvent.findById(req.params.id);
+    let event = null;
+
+    // Try MongoDB ObjectId lookup when valid
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      event = await HistoricalEvent.findById(id);
+    }
+
+    // Fallback: support legacy/custom numeric/string id field
+    if (!event) {
+      event = await HistoricalEvent.findOne({ id });
+    }
 
     if (!event) return res.status(404).json({ message: "Event not found" });
 
