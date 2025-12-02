@@ -26,7 +26,7 @@ export const getEvents = async (req, res) => {
 // Get single event by ID
 export const getEventById = async (req, res) => {
   try {
-    const event = await HistoricalEvent.findOne({ id: req.params.id });
+    const event = await HistoricalEvent.findById(req.params.id);
 
     if (!event) return res.status(404).json({ message: "Event not found" });
 
