@@ -22,7 +22,7 @@ app.use("/api/eras", eraRoutes);
 app.use("/api/stories", storyRoutes);
 
 app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
+  res.send("Backend is running 🚀 v2");
 });
 
 const PORT = process.env.PORT || 5000;
