@@ -4,6 +4,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api
 
 interface BackendEvent {
   _id: string;
+  id: string;
   title: string;
   year: number;
   era?: string;
@@ -11,7 +12,12 @@ interface BackendEvent {
   shortDescription?: string;
   longDescription?: string;
   continent?: string;
+  country?: string;
   locationName?: string;
+  location?: {
+    lat: number;
+    lng: number;
+  };
   coordinates?: {
     type: string;
     coordinates: [number, number]; // [lng, lat]
@@ -20,15 +26,22 @@ interface BackendEvent {
 }
 
 const mapBackendEventToHistoricalEvent = (event: BackendEvent): HistoricalEvent => {
-  const [lng, lat] = event.coordinates?.coordinates || [0, 0];
+  // Use location object if available, otherwise fall back to coordinates array
+  let lat = 0, lng = 0;
+  if (event.location) {
+    lat = event.location.lat;
+    lng = event.location.lng;
+  } else if (event.coordinates?.coordinates) {
+    [lng, lat] = event.coordinates.coordinates;
+  }
 
   return {
-    id: event._id,
+    id: event.id, // Use the custom id field instead of _id
     title: event.title,
     year: event.year,
     category: (event.category as HistoricalEvent['category']) || 'Science',
     continent: (event.continent as HistoricalEvent['continent']) || 'Asia',
-    country: event.locationName || 'Unknown',
+    country: event.country || event.locationName || 'Unknown',
     location: {
       lat,
       lng
